@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roulette Wheel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f3f3f3;
+            margin: 0;
+        }
+        .roulette-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            border: 10px solid black;
+            background: conic-gradient(
+                #ff0000 0deg 9deg,
+                #000000 9deg 18deg,
+                #ff0000 18deg 27deg,
+                #000000 27deg 36deg,
+                #ff0000 36deg 45deg,
+                #000000 45deg 54deg,
+                #ff0000 54deg 63deg,
+                #000000 63deg 72deg,
+                #ff0000 72deg 81deg,
+                #000000 81deg 90deg,
+                #ff0000 90deg 99deg,
+                #000000 99deg 108deg,
+                #ff0000 108deg 117deg,
+                #000000 117deg 126deg,
+                #ff0000 126deg 135deg,
+                #000000 135deg 144deg,
+                #ff0000 144deg 153deg,
+                #000000 153deg 162deg,
+                #ff0000 162deg 171deg,
+                #000000 171deg 180deg,
+                #ff0000 180deg 189deg,
+                #000000 189deg 198deg,
+                #ff0000 198deg 207deg,
+                #000000 207deg 216deg,
+                #ff0000 216deg 225deg,
+                #000000 225deg 234deg,
+                #ff0000 234deg 243deg,
+                #000000 243deg 252deg,
+                #ff0000 252deg 261deg,
+                #000000 261deg 270deg,
+                #ff0000 270deg 279deg,
+                #000000 279deg 288deg,
+                #ff0000 288deg 297deg,
+                #000000 297deg 306deg,
+                #ff0000 306deg 315deg,
+                #000000 315deg 324deg,
+                #ff0000 324deg 333deg,
+                #000000 333deg 342deg,
+                #ff0000 342deg 350deg
+            );
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        .roulette-numbers {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            pointer-events: none;
+        }
+        .number {
+            position: absolute;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 5px rgba(0,0,0,0.7);
+        }
+        .pointer {
+            position: absolute;
+            top: 10px;
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-bottom: 30px solid black;
+            z-index: 10;
+        }
+        .ball {
+            position: absolute;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            border-radius: 50%;
+            z-index: 5;
+            transition: top 4s ease-out, left 4s ease-out;
+        }
+        .spin-button {
+            margin-top: 30px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .spin-button:active {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="roulette-container">
+    <div class="pointer"></div>
+    <div class="ball" id="ball"></div>
+    <div class="roulette-numbers" id="rouletteNumbers"></div>
+</div>
+<button class="spin-button" onclick="spinWheel()">Spin</button>
+<div class="result" id="result">Result: </div>
+
+<script>
+    const rouletteWheel = document.querySelector('.roulette-container');
+    const ball = document.getElementById('ball');
+    const resultText = document.getElementById('result');
+    const rouletteNumbers = document.getElementById('rouletteNumbers');
+
+    // Numbers and positions for roulette wheel sections
+    const sections = [
+        { number: "0", color: "green" },
+        { number: "32", color: "red" },
+        { number: "15", color: "black" },
+        { number: "19", color: "red" },
+        { number: "4", color: "black" },
+        { number: "21", color: "red" },
+        { number: "2", color: "black" },
+        { number: "25", color: "red" },
+        { number: "17", color: "black" },
+        { number: "34", color: "red" },
+        { number: "6", color: "black" },
+        { number: "27", color: "red" },
+        { number: "13", color: "black" },
+        { number: "36", color: "red" },
+        { number: "11", color: "black" },
+        { number: "30", color: "red" },
+        { number: "8", color: "black" },
+        { number: "23", color: "red" },
+        { number: "10", color: "black" },
+        { number: "5", color: "red" },
+        { number: "24", color: "black" },
+        { number: "16", color: "red" },
+        { number: "33", color: "black" },
+        { number: "1", color: "red" },
+        { number: "20", color: "black" },
+        { number: "14", color: "red" },
+        { number: "31", color: "black" },
+        { number: "9", color: "red" },
+        { number: "22", color: "black" },
+        { number: "18", color: "red" },
+        { number: "29", color: "black" },
+        { number: "7", color: "red" },
+        { number: "28", color: "black" },
+        { number: "12", color: "red" },
+        { number: "35", color: "black" },
+        { number: "3", color: "red" },
+        { number: "26", color: "black" }
+    ];
+
+    // Position each number on the roulette wheel
+    function setupNumbers() {
+        const radius = 140; // Distance from center for the numbers
+        const angleStep = 360 / sections.length;
+
+        sections.forEach((section, index) => {
+            const angle = angleStep * index;
+            const x = Math.cos((angle * Math.PI) / 180) * radius + 150; // X position
+            const y = Math.sin((angle * Math.PI) / 180) * radius + 150; // Y position
+            const numberDiv = document.createElement('div');
+            numberDiv.textContent = section.number;
+            numberDiv.style.color = section.color;
+            numberDiv.style.position = 'absolute';
+            numberDiv.style.transform = `translate(-50%, -50%) rotate(${angle}deg)`;
+            numberDiv.classList.add('number');
+            numberDiv.style.left = `${x}px`;
+            numberDiv.style.top = `${y}px`;
+
+            rouletteNumbers.appendChild(numberDiv);
+        });
+    }
+
+    function spinWheel() {
+        // Generate a random rotation between 720deg and 1080deg (2-3 full spins)
+        const randomDegree = Math.floor(Math.random() * 360) + 720;
+
+        // Set the CSS transformation to rotate the wheel
+        rouletteWheel.style.transition = "transform 4s ease-out";
+        rouletteWheel.style.transform = `rotate(${randomDegree}deg)`;
+
+        // Move the ball
+        const ballStartPos = { top: 0, left: 140 };
+        ball.style.transition = "none"; // Reset ball transition for smooth movement
+        ball.style.top = `${ballStartPos.top}px`;
+        ball.style.left = `${ballStartPos.left}px`;
+
+        // Ball animation to spin around the track
+        setTimeout(() => {
+            ball.style.transition = "top 4s ease-out, left 4s ease-out";
+            const ballFinalPos = getBallPosition(randomDegree);
+            ball.style.top = `${ballFinalPos.top}px`;
+            ball.style.left = `${ballFinalPos.left}px`;
+        }, 10);
+
+        // Display the result after the wheel finishes spinning
+        setTimeout(() => {
+            const result = getRouletteResult(randomDegree);
+            resultText.textContent = `Result: ${result}`;
+        }, 4000);
+    }
+
+    function getBallPosition(degrees) {
+        const radius = 140;
+        const angle = degrees % 360;
+        const x = Math.cos((angle * Math.PI) / 180) * radius + 150;
+        const y = Math.sin((angle * Math.PI) / 180) * radius + 150;
+        return { top: y - 10, left: x - 10 }; // Ball size adjustment
+    }
+
+    function getRouletteResult(degrees) {
+        const sectionsCount = sections.length;
+        const degreePerSection = 360 / sectionsCount;
+        const sectionIndex = Math.floor((degrees % 360) / degreePerSection);
+        return sections[sectionIndex].number;
+    }
+
+    setupNumbers();
+</script>
+
+</body>
+</html>
